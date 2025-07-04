@@ -16,8 +16,7 @@ function prefix() {
 
 echo "Digitale Orthophotos (dop)"
 
-#YEARS="1957 1965 1977 1981 1991 2002 2006 2015 2021"
-YEARS="1957 1965 1977 2023"
+YEARS="1957 1965 1977 1981 1991 2002 2006 2015 2021 2023"
 PARTS="Nord"
 
 for year in $YEARS; do
@@ -32,7 +31,7 @@ for year in $YEARS; do
     if [[ -e $file ]]; then
       echo "      downloading skipped, because $file already exists"
     else 
-      url="https://opengeodata.hannover-stadt.de/$remote_file.zip"
+      url="https://opengeodata.hannover-stadt.de/$remote_file"
       echo "      downloading $url"
       wget --no-clobber --output-document "$file" "$url"
     fi

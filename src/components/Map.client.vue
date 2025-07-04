@@ -39,7 +39,7 @@ const maxBounds = ref([[52.2, 9.6], [53, 10]])
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
 
-const years = ref([1957, 1965, 1977, 2023])
+const years = ref([1957, 1965, 1977, 1981, 1991, 2002, 2006, 2015, 2021, 2023])
 
 const year = computed(() => {
   const yy = yearsOpacity.value.entries()
