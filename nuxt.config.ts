@@ -3,5 +3,6 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-05-15',
   srcDir: 'src/',
   devtools: { enabled: true },
+  ssr: false,
   modules: ['@nuxt/ui']
 })
