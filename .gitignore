@@ -1,6 +1,6 @@
 # app caches
 download
-src/public/tiles
+public/tiles
 
 # Nuxt dev/build outputs
 .output

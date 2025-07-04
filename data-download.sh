@@ -4,7 +4,7 @@ BASE_DIR="$( dirname "$(realpath $0)" )"
 cd $BASE_DIR
 
 DOWNLOAD_DIR="$BASE_DIR/download/dop"
-TILES_DIR="$BASE_DIR/src/public/tiles/dop"
+TILES_DIR="$BASE_DIR/public/tiles/dop"
 mkdir -p $DOWNLOAD_DIR
 mkdir -p $TILES_DIR
 
