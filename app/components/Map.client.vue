@@ -16,8 +16,14 @@
               {{ baseOpacity }}
 
               <span>Jahr</span>
-              <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="0.1" size="sm" />
+              <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="fadeYears ? 0.1 : 1" size="sm" />
               {{ year }}
+            </div>
+            <div class="flex mt-2">
+              <div class="flex gap-1">
+                <USwitch v-model="fadeYears"/>
+                <span>Jahre überblenden</span>
+              </div>
             </div>
           </div>
         </div>
@@ -38,6 +44,7 @@ const maxBounds = ref([[52.2, 9.6], [53, 10]])
 
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
+const fadeYears = ref(false)
 
 const years = ref([1957, 1965, 1977, 1981, 1991, 2002, 2006, 2015, 2021, 2023])
 
@@ -68,6 +75,12 @@ const yearsOpacity = computed(() => {
     }
     return 0 // should not happen
   })
+})
+
+watch(fadeYears, (enabled) => {
+  if (!enabled) {
+    yearSlider.value = Math.round(yearSlider.value)
+  }
 })
 
 </script>
