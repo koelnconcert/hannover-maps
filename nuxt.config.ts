@@ -7,5 +7,8 @@ export default defineNuxtConfig({
   modules: ['@nuxt/ui'],
   future: {
     compatibilityVersion: 4
+  },
+  ui: {
+    colorMode: false
   }
 })
