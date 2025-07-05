@@ -4,7 +4,7 @@
       :minZoom="minZoom" :maxZoom="maxZoom">
       <template v-for="(year, index) in years" :key="year">
         <LTileLayer :url="config.public.tileBaseUrl + 'dop/' + year + '/{z}/{x}/{y}.png'" :tms="true" layer-type="overlay"
-          :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1"/>
+          :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" :options="dopOptions"/>
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :z-index="2"/>
       <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
@@ -53,9 +53,13 @@ const config = useRuntimeConfig()
 
 const zoom = ref(12)
 const minZoom = ref(12)
-const maxZoom = ref(19)
+const maxZoom = ref(22)
 const center = ref([52.4, 9.7])
 const maxBounds = ref([[52.2, 9.6], [53, 10]])
+const dopOptions = {
+  minNativeZoom: 12,
+  maxNativeZoom: 19
+}
 
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
