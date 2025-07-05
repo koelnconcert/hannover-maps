@@ -3,7 +3,7 @@
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="minZoom" :maxZoom="maxZoom">
       <template v-for="(year, index) in years" :key="year">
-        <LTileLayer :url="'/tiles/dop/' + year + '/{z}/{x}/{y}.png'" :tms="true" layer-type="overlay"
+        <LTileLayer :url="config.public.tileBaseUrl + 'dop/' + year + '/{z}/{x}/{y}.png'" :tms="true" layer-type="overlay"
           :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1"/>
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :z-index="2"/>
@@ -44,6 +44,8 @@
 <script lang="ts" setup>
 import "leaflet/dist/leaflet.css"
 import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
+
+const config = useRuntimeConfig()
 
 const zoom = ref(12)
 const minZoom = ref(12)

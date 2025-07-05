@@ -10,5 +10,10 @@ export default defineNuxtConfig({
   },
   ui: {
     colorMode: false
+  },
+  runtimeConfig: {
+    public: {
+      tileBaseUrl: process.env.TILE_BASE_URL
+    }
   }
 })
