@@ -4,9 +4,9 @@
       :minZoom="minZoom" :maxZoom="maxZoom">
       <template v-for="(year, index) in years" :key="year">
         <LTileLayer :url="'/tiles/dop/' + year + '/{z}/{x}/{y}.png'" :tms="true" layer-type="overlay"
-          :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom"/>
+          :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1"/>
       </template>
-      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity"/>
+      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :z-index="2"/>
       <div class="relative flex justify-around w-full m-3">
         <div class="relative z-1000 w-1/3 cursor-default text-gray-800">
           <div class="border-2 border-gray-300 rounded-sm bg-gray-100 p-3">
