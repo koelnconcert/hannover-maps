@@ -11,13 +11,21 @@
       <div class="relative flex justify-around w-full m-3">
         <div class="relative z-1000 w-1/3 cursor-default text-gray-800">
           <div class="border-2 border-gray-300 rounded-sm bg-gray-100 p-3">
-            <div class="grid grid-cols-[max-content_1fr_55px] gap-2">
+            <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
               <span>Transparenz</span>
               <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm" />
               {{ baseOpacity }}
 
               <span>Jahr</span>
-              <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="fadeYears ? 0.1 : 1" size="sm" />
+              <div class="flex gap-2">
+                <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="fadeYears ? 0.1 : 1" size="sm" />
+                <UButtonGroup size="xs">
+                  <UButton variant="outline" icon="i-lucide-chevron-first" :disabled="yearSlider <= 0" @click="yearSlider = 0"/>
+                  <UButton variant="outline" icon="i-lucide-chevron-left" :disabled="yearSlider <= 0" @click="yearSlider--"/>
+                  <UButton variant="outline" icon="i-lucide-chevron-right" :disabled="yearSlider >= years.length - 1" @click="yearSlider++"/>
+                  <UButton variant="outline" icon="i-lucide-chevron-last" :disabled="yearSlider >= years.length - 1" @click="yearSlider = years.length - 1"/>
+                </UButtonGroup>
+              </div>
               {{ year }}
             </div>
             <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
