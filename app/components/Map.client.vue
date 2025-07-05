@@ -7,6 +7,7 @@
           :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1"/>
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :z-index="2"/>
+      <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
       <div class="relative flex justify-around w-full m-3">
         <div class="relative z-1000 w-1/3 cursor-default text-gray-800">
           <div class="border-2 border-gray-300 rounded-sm bg-gray-100 p-3">
@@ -19,7 +20,7 @@
               <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="fadeYears ? 0.1 : 1" size="sm" />
               {{ year }}
             </div>
-            <div class="flex mt-2 gap-5">
+            <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
               <div class="flex gap-1">
                 <USwitch v-model="preload"/>
                 <span>Alle Jahre vorladen</span>
@@ -32,7 +33,10 @@
                 <USwitch v-model="grayscale"/>
                 <span>nur Graustufen</span>
               </div>
-              Zoom: {{ zoom }}
+              <div class="flex gap-1">
+                <USwitch v-model="debugGrid"/>
+                <span>Debug-Grid</span>
+              </div>
             </div>
           </div>
         </div>
@@ -43,7 +47,7 @@
 
 <script lang="ts" setup>
 import "leaflet/dist/leaflet.css"
-import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
+import { LMap, LTileLayer, LGridLayer } from "@vue-leaflet/vue-leaflet"
 
 const config = useRuntimeConfig()
 
@@ -58,6 +62,7 @@ const yearSlider = ref(0)
 const fadeYears = ref(false)
 const grayscale = ref(false)
 const preload = ref(true)
+const debugGrid = ref(false)
 
 const years = ref([1957, 1965, 1977, 1981, 1991, 2002, 2006, 2015, 2021, 2023])
 
@@ -95,6 +100,15 @@ watch(fadeYears, (enabled) => {
     yearSlider.value = Math.round(yearSlider.value)
   }
 })
+
+const debugGridLayer = function (props: any) {
+  return () => {
+    return h("div",
+      { style: "border: 1px solid black; height: 100%; color: black;" },
+      [props.coords.z, props.coords.x, props.coords.y].join('/')
+    )
+  }
+}
 </script>
 
 <style scoped>
