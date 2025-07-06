@@ -15,5 +15,10 @@ export default defineNuxtConfig({
     public: {
       tileBaseUrl: process.env.TILE_BASE_URL
     }
+  },
+  nitro: {
+    devProxy: {
+      "/tiles": 'http://localhost:3001/tiles'
+    }
   }
 })
