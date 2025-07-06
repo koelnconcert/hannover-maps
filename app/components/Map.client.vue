@@ -6,7 +6,7 @@
         <LTileLayer :url="config.public.tileBaseUrl + 'dop/' + year + '/{z}/{x}/{y}.png'" :tms="true" layer-type="overlay"
           :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" :options="dopOptions"/>
       </template>
-      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :z-index="2"/>
+      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"/>
       <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
       <div class="relative flex justify-around w-full m-3">
         <div class="relative z-1000 w-1/3 cursor-default text-gray-800">
@@ -30,7 +30,7 @@
 
               <span>Animation</span>
               <div class="flex gap-2">
-                <USlider v-model="playingSpeed" :min="0.1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
+                <USlider v-model="playingSpeed" :min="1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
                 <UButton size="xs" variant="outline" :icon="playing ? 'i-lucide-pause' : 'i-lucide-play'" :disabled="yearSlider >= years.length" @click="playing = !playing"/>
               </div>
               <span>{{ playingSpeed }}s</span>
