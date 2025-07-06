@@ -8,7 +8,7 @@
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"/>
       <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
-      <MapBox>
+      <MapBox position-x="center" position-y="top" class="p-3">
         <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
           <span>Transparenz</span>
           <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
