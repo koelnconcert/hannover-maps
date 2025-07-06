@@ -63,6 +63,7 @@
 
 <script lang="ts" setup>
 import "leaflet/dist/leaflet.css"
+import type { PointExpression } from "leaflet"
 import { LMap, LTileLayer, LGridLayer } from "@vue-leaflet/vue-leaflet"
 
 const config = useRuntimeConfig()
@@ -70,7 +71,7 @@ const config = useRuntimeConfig()
 const zoom = ref(12)
 const minZoom = ref(12)
 const maxZoom = ref(22)
-const center = ref([52.4, 9.7])
+const center = ref<PointExpression>([52.4, 9.7])
 const maxBounds = ref([[52.2, 9.6], [53, 10]])
 const dopOptions = {
   minNativeZoom: 12,
