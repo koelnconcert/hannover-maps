@@ -8,55 +8,51 @@
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"/>
       <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
-      <div class="relative flex justify-around w-full m-3">
-        <div class="relative z-1000 w-1/3 cursor-default text-gray-800">
-          <div class="border-2 border-gray-300 rounded-sm bg-gray-100 p-3">
-            <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
-              <span>Transparenz</span>
-              <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
-              {{ baseOpacity }}
+      <MapBox>
+        <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
+          <span>Transparenz</span>
+          <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
+          {{ baseOpacity }}
 
-              <span>Jahr</span>
-              <div class="flex gap-2">
-                <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="yearSliderStep" size="sm" :disabled="playing"/>
-                <UButtonGroup size="xs">
-                  <UButton variant="outline" icon="i-lucide-chevron-first" :disabled="playing || yearSlider <= 0" @click="yearSlider = 0"/>
-                  <UButton variant="outline" icon="i-lucide-chevron-left" :disabled="playing || yearSlider <= 0" @click="yearSlider--"/>
-                  <UButton variant="outline" icon="i-lucide-chevron-right" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider++"/>
-                  <UButton variant="outline" icon="i-lucide-chevron-last" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider = years.length - 1"/>
-                </UButtonGroup>
-              </div>
-              {{ year }}
+          <span>Jahr</span>
+          <div class="flex gap-2">
+            <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="yearSliderStep" size="sm" :disabled="playing"/>
+            <UButtonGroup size="xs">
+              <UButton variant="outline" icon="i-lucide-chevron-first" :disabled="playing || yearSlider <= 0" @click="yearSlider = 0"/>
+              <UButton variant="outline" icon="i-lucide-chevron-left" :disabled="playing || yearSlider <= 0" @click="yearSlider--"/>
+              <UButton variant="outline" icon="i-lucide-chevron-right" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider++"/>
+              <UButton variant="outline" icon="i-lucide-chevron-last" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider = years.length - 1"/>
+            </UButtonGroup>
+          </div>
+          {{ year }}
 
-              <span>Animation</span>
-              <div class="flex gap-2">
-                <USlider v-model="playingSpeed" :min="1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
-                <UButton size="xs" variant="outline" :icon="playing ? 'i-lucide-pause' : 'i-lucide-play'" :disabled="yearSlider >= years.length" @click="playing = !playing"/>
-              </div>
-              <span>{{ playingSpeed }}s</span>
+          <span>Animation</span>
+          <div class="flex gap-2">
+            <USlider v-model="playingSpeed" :min="1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
+            <UButton size="xs" variant="outline" :icon="playing ? 'i-lucide-pause' : 'i-lucide-play'" :disabled="yearSlider >= years.length" @click="playing = !playing"/>
+          </div>
+          <span>{{ playingSpeed }}s</span>
 
-            </div>
-            <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
-              <div class="flex gap-1">
-                <USwitch v-model="preload"/>
-                <span>Alle Jahre vorladen</span>
-              </div>
-              <div class="flex gap-1">
-                <USwitch v-model="fadeYears"/>
-                <span>Jahre überblenden</span>
-              </div>
-              <div class="flex gap-1">
-                <USwitch v-model="grayscale"/>
-                <span>nur Graustufen</span>
-              </div>
-              <div class="flex gap-1">
-                <USwitch v-model="debugGrid"/>
-                <span>Debug-Grid</span>
-              </div>
-            </div>
+        </div>
+        <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
+          <div class="flex gap-1">
+            <USwitch v-model="preload"/>
+            <span>Alle Jahre vorladen</span>
+          </div>
+          <div class="flex gap-1">
+            <USwitch v-model="fadeYears"/>
+            <span>Jahre überblenden</span>
+          </div>
+          <div class="flex gap-1">
+            <USwitch v-model="grayscale"/>
+            <span>nur Graustufen</span>
+          </div>
+          <div class="flex gap-1">
+            <USwitch v-model="debugGrid"/>
+            <span>Debug-Grid</span>
           </div>
         </div>
-      </div>
+      </MapBox>
     </LMap>
   </div>
 </template>
