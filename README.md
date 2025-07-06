@@ -11,6 +11,8 @@ Local development
 ### backend
 
 ```bash
+cd backend
+
 npm ci
 npm run data-download
 npm run dev
@@ -19,6 +21,8 @@ npm run dev
 ### frontend
 
 ```bash
+cd frontend
+
 cp .env.example .env
 # adjust .env to your needs
 
