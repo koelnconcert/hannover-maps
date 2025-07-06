@@ -47,5 +47,5 @@ for year in $YEARS; do
   processes=$(( $(nproc) * 3 / 4 ))
   echo "    converting to tiles with $processes threads: "
   mkdir -p $TILES_DIR/$year
-  gdal2tiles.py --resume --processes $processes --zoom 12-19 --s_srs EPSG:25832 $vrtfile $TILES_DIR/$year
+  gdal2tiles --resume --processes $processes --zoom 12-19 --s_srs EPSG:25832 $vrtfile $TILES_DIR/$year
 done
