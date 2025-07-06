@@ -53,6 +53,9 @@
           </div>
         </div>
       </MapBox>
+      <MapBox position-x="right" position-y="top" class="px-1  text-lg">
+        {{ year }}
+      </MapBox>
     </LMap>
   </div>
 </template>
