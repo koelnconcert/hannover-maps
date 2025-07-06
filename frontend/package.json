@@ -1,5 +1,5 @@
 {
-  "name": "nuxt-app",
+  "name": "hannover-maps-frontend",
   "private": true,
   "type": "module",
   "scripts": {
@@ -7,8 +7,7 @@
     "dev": "nuxt dev",
     "generate": "nuxt generate",
     "preview": "nuxt preview",
-    "postinstall": "nuxt prepare",
-    "data-download": "./data-download.sh"
+    "postinstall": "nuxt prepare"
   },
   "dependencies": {
     "@nuxt/ui": "^3.2.0",

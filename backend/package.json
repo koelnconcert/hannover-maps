@@ -1,0 +1,10 @@
+{
+  "name": "hannover-maps-backend",
+  "scripts": {
+    "dev": "http-server public",
+    "data-download": "./data-download.sh"
+  },
+  "dependencies": {
+    "http-server": "^14.1.1"
+  }
+}
