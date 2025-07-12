@@ -27,7 +27,7 @@
               <UButton variant="outline" icon="i-lucide-chevron-last" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider = years.length - 1"/>
             </UButtonGroup>
           </div>
-          {{ year }}
+          {{ yearDisplay }}
 
           <span>Jahr-Deadzone</span>
           <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm"/>
@@ -61,7 +61,7 @@
         </div>
       </MapBox>
       <MapBox position-x="right" position-y="top" class="px-1 text-xl">
-        {{ year }}
+        {{ yearDisplay }}
       </MapBox>
     </LMap>
   </div>
@@ -102,7 +102,7 @@ const attribution = {
 
 const years = ref([1957, 1965, 1977, 1981, 1991, 2002, 2006, 2015, 2021, 2023])
 
-const year = computed(() => {
+const yearDisplay = computed(() => {
   const yy = yearsOpacity.value.entries()
     .filter(([, value]) => value > 0)
     .map(([index]) => years.value[index])
