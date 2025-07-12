@@ -1,5 +1,14 @@
 <template>
-  <div class="absolute m-3 z-1000 cursor-default text-gray-800 border-2 border-gray-300 rounded-sm bg-gray-100" :class="positionClasses">
+  <div
+    class="absolute m-3 z-1000 cursor-default text-gray-800 border-2 border-gray-300 rounded-sm bg-gray-100"
+    :class="positionClasses"
+    @mousedown.stop
+    @pointerdown.stop
+    @touchstart.stop
+    @dblclick.stop
+    @click.stop
+    @wheel.stop
+  >
     <slot />
   </div>
 </template>
