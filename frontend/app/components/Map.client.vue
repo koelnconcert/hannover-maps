@@ -12,7 +12,7 @@
         <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
           <span>Transparenz</span>
           <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
-          {{ baseOpacity }}
+          {{ baseOpacity.toFixed(2) }}
 
           <span>Jahr</span>
           <div class="flex gap-2">
@@ -25,6 +25,10 @@
             </UButtonGroup>
           </div>
           {{ year }}
+
+          <span>Jahr-Deadzone</span>
+          <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm"/>
+          {{ yearSliderDeadzone.toFixed(2) }}
 
           <span>Animation</span>
           <div class="flex gap-2">
@@ -79,6 +83,7 @@ const dopOptions = {
 
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
+const yearSliderDeadzone = ref(0.2)
 const playing = ref(false)
 const playingSpeed = ref(1)
 const fadeYears = ref(false)
@@ -97,21 +102,27 @@ const year = computed(() => {
 
 const yearsOpacity = computed(() => {
   const value = yearSlider.value
-  const round = Math.round(value)
   const floor = Math.floor(value)
   const ceil = Math.ceil(value)
+  const diff = value - floor
+  const deadzone = yearSliderDeadzone.value
+  const inUpperDeadzone = diff > 1 - deadzone
+  const inLowerDeadzone = diff < deadzone
   return [...Array(years.value.length).keys()].map(i => {
     if (i < floor || i > ceil) {
       return 0
     }
-    if (value == ceil) {
-      return 1
-    }
     if (i == floor) {
-      return 1
+      return inUpperDeadzone ? 0 : 1
     }
     if (i == ceil) {
-      return value - floor
+      if (inLowerDeadzone) {
+        return 0
+      } else if (inUpperDeadzone) {
+        return 1
+      } else {
+        return (diff - deadzone) / (1 - 2 * deadzone )
+      }
     }
     return 0 // should not happen
   })
