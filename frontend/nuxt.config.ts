@@ -5,9 +5,6 @@ export default defineNuxtConfig({
   ssr: false,
   css: ['~/assets/css/main.css'],
   modules: ['@nuxt/ui'],
-  future: {
-    compatibilityVersion: 4
-  },
   ui: {
     colorMode: false
   },
