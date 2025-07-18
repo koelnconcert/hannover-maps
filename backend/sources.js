@@ -30,7 +30,13 @@ const sources = {
       parts: arrayToObject(PARTS, part => ({
         downloadUrl: downloadBaseUrl + '/' +
           ((year === 2023) ? `DOP20_Teil_${part}.zip` : `${year}_${part}.zip`),
-      }))
+      })),
+      srs: 'EPSG:25832',
+      tiles: {
+        minZoom: 12,
+        maxZoom: 19,
+        fileExtension: (year <= 2002) ? 'jpg' : 'webp' // grayscale images not supported by WEBP
+      }
     }))
   }
 }

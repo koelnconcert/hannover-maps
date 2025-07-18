@@ -16,6 +16,11 @@ const TILES_BASE_DIR = 'public/tiles/dop'
 fs.mkdirSync(DOWNLOAD_DIR, { recursive: true })
 fs.mkdirSync(TILES_BASE_DIR, { recursive: true })
 
+const tiledriverForExtension = {
+  webp: 'WEBP',
+  jpg: 'JPEG'
+}
+
 for (const [sourceId, source] of Object.entries(sources)) {
   console.log(source.name)
   for (const [year, yearObject] of Object.entries(source.years)) {
@@ -53,17 +58,19 @@ for (const [sourceId, source] of Object.entries(sources)) {
       console.log('    creating ' + vrtfile)
       execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
 
+      const tileConfig = yearObject.tiles
+
       const processes = Math.floor(os.cpus().length * 3 / 4 )
-      const tiledriver = (year <= 2002) ? 'JPEG' : 'WEBP' // grayscale images not supported by WEBP
+      const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
       const tilesDir = TILES_BASE_DIR + '/' + year
       console.log(`    converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
       fs.mkdirSync(tilesDir, { recursive: true })
       const gdal2tilesArgs = [
         '--resume',
         '--processes', processes.toString(),
-        '--zoom', '12-19',
+        '--zoom', tileConfig.minZoom + '-' + tileConfig.maxZoom,
         '--xyz',
-        '--s_srs', 'EPSG:25832',
+        '--s_srs', yearObject.srs,
         '--tiledriver', tiledriver,
         DOWNLOAD_DIR + '/' + vrtfile,
         tilesDir
