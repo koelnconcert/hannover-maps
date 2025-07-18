@@ -2,9 +2,16 @@
   "name": "hannover-maps-backend",
   "scripts": {
     "dev": "http-server public --port 3001",
-    "data-download": "./data-download.sh"
+    "data-download": "node data-download.js"
   },
+  "type": "module",
   "dependencies": {
     "http-server": "^14.1.1"
+  },
+  "devDependencies": {
+    "decompress": "^4.2.1",
+    "log-update": "^6.1.0",
+    "nano-spawn": "^1.0.2",
+    "nodejs-file-downloader": "^4.13.0"
   }
 }
