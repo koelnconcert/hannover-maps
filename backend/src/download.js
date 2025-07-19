@@ -3,11 +3,11 @@ import os from 'node:os'
 import { execSync } from 'node:child_process'
 
 import { Downloader } from 'nodejs-file-downloader'
-import logUpdate from 'log-update'
 import decompress from 'decompress'
 import spawn from 'nano-spawn'
 
 import sources from './sources.js'
+import { createLogger } from './logger.js'
 
 // console.debug(JSON.stringify(sources, null, 2))
 
@@ -17,15 +17,6 @@ const TILES_BASE_DIR = 'public/tiles'
 const tiledriverForExtension = {
   webp: 'WEBP',
   jpg: 'JPEG'
-}
-
-function createLogger(...breadcrumbs) {
-  const prefix = breadcrumbs.join('/') + ' > '
-  return {
-    log: (msg) => console.log(prefix + msg),
-    logReplace: (msg) => logUpdate(prefix + msg),
-    createLogger: (...additionalBreadcrumbs) => createLogger(...breadcrumbs, ...additionalBreadcrumbs)
-  }
 }
 
 const VRT_FILENAME = 'all.vrt'
