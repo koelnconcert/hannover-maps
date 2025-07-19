@@ -7,14 +7,12 @@ const PARTS = ['Nord']
 
 const arrayToObject = (array, mapper) => Object.fromEntries(array.map(key => [key, mapper(key)]))
 
-const licenses = {
-  'CC-BY-4.0': {
-    name: 'Creative Commons Namensnennung 4.0 DE',
-    url: 'https://creativecommons.org/licenses/by/4.0/deed.de'
-  }
+// source: https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover/Dezernate-und-Fachbereiche-der-LHH/Stadtentwicklung-und-Bauen/Fachbereich-Planen-und-Stadtentwicklung/Geoinformation/Open-GeoData/Nutzungsbedingungen
+const defaultLicense = {
+  name: 'Creative Commons Namensnennung 4.0 DE',
+  url: 'https://creativecommons.org/licenses/by/4.0/deed.de',
+  holder: 'Bereich Geoinformation – LH Hannover'
 }
-
-const defaultLicenseHolder = 'Landeshauptstadt Hannover'
 
 const sources = {
   dop: {
@@ -23,10 +21,7 @@ const sources = {
     years: arrayToObject(YEARS, year => ({
       website: dopWebsiteBaseUrl + '/' +
         ((year === 2023) ? 'Digitale' : 'Historische') + '-Orthophotos-Jahrgang-' + year,
-      license: {
-        ...licenses['CC-BY-4.0'],
-        holder: defaultLicenseHolder
-      },
+      license: defaultLicense,
       parts: arrayToObject(PARTS, part => ({
         downloadUrl: downloadBaseUrl + '/' +
           ((year === 2023) ? `DOP20_Teil_${part}.zip` : `${year}_${part}.zip`),
