@@ -25,63 +25,68 @@ const _log = (f, breadcrumbs, msg) => f(breadcrumbs.join('/') + ' > ' + msg)
 const log = (...args) => _log(console.log, ...args)
 const logReplace = (...args) => _log(logUpdate, ...args)
 
+async function downloadPart(partId, partConfig, downloadDir, logPrefix) {
+  const name = logPrefix[1] + '_' + partId
+  const file = name + '.zip'
+  const fullFilename = downloadDir + '/' + file
+
+  if (fs.existsSync(fullFilename)) {
+    log(logPrefix, `downloading skipped, because ${file} already exists`)
+  } else {
+    const url = partConfig.downloadUrl
+    const downloader = new Downloader({
+      url,
+      directory: downloadDir,
+      fileName: file,
+      onProgress: function (percentage, chunk, remainingSize) {
+        logReplace(logPrefix, `downloading ${url}: ${percentage}%`)
+      }
+    })
+    await downloader.download()
+  }
+  
+  const extractDir = downloadDir + '/' + name
+  if (fs.existsSync(extractDir)) {
+    log(logPrefix, `unzipping skipped, because directory ${name} already exists`)
+  } else {
+    log(logPrefix, `unzipping ${file} to directory ${name}`)
+    await decompress(fullFilename, extractDir)
+  }
+}
+
+async function createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix) {
+  const vrtfile = year + '.vrt'
+  log(logPrefix, 'creating ' + vrtfile)
+  execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
+
+  const tileConfig = yearConfig.tiles
+
+  const processes = Math.floor(os.cpus().length * 3 / 4 )
+  const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
+  log(logPrefix, `converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
+  fs.mkdirSync(tilesDir, { recursive: true })
+  const gdal2tilesArgs = [
+    '--resume',
+    '--processes', processes.toString(),
+    '--zoom', tileConfig.minZoom + '-' + tileConfig.maxZoom,
+    '--xyz',
+    '--s_srs', yearConfig.srs,
+    '--tiledriver', tiledriver,
+    downloadDir + '/' + vrtfile,
+    tilesDir
+  ]
+  await spawn('gdal2tiles', gdal2tilesArgs, {
+    stdout: 'inherit'
+  })
+}
+
 for (const [sourceId, source] of Object.entries(sources)) {
   log([sourceId], `"${source.name}"`)
-  for (const [year, yearObject] of Object.entries(source.years)) {
+  for (const [year, yearConfig] of Object.entries(source.years)) {
     const logPrefix = [sourceId, year]
-    for (const [part, partObject] of Object.entries(yearObject.parts)) {
-      const logPrefixPart = logPrefix.concat(part)
-      const name = year + '_' + part
-      const file = name + '.zip'
-      const fullFilename = DOWNLOAD_DIR + '/' + file
-
-      if (fs.existsSync(fullFilename)) {
-        log(logPrefixPart, `downloading skipped, because ${file} already exists`)
-      } else {
-        const url = partObject.downloadUrl
-        const downloader = new Downloader({
-          url,
-          directory: DOWNLOAD_DIR,
-          fileName: file,
-          onProgress: function (percentage, chunk, remainingSize) {
-            logReplace(logPrefixPart, `downloading ${url}: ${percentage}%`)
-          }
-        })
-        await downloader.download()
-      }
-
-      const extractDir = DOWNLOAD_DIR + '/' + name
-      if (fs.existsSync(extractDir)) {
-        log(logPrefixPart, `unzipping skipped, because directory ${name} already exists`)
-      } else {
-        log(logPrefixPart, `unzipping ${file} to directory ${name}`)
-        await decompress(fullFilename, extractDir)
-      }
+    for (const [partId, partConfig] of Object.entries(yearConfig.parts)) {
+      await downloadPart(partId, partConfig, DOWNLOAD_DIR, logPrefix.concat(partId))
     }
-
-    const vrtfile = year + '.vrt'
-    log(logPrefix, 'creating ' + vrtfile)
-    execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
-
-    const tileConfig = yearObject.tiles
-
-    const processes = Math.floor(os.cpus().length * 3 / 4 )
-    const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
-    const tilesDir = TILES_BASE_DIR + '/' + year
-    log(logPrefix, `converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
-    fs.mkdirSync(tilesDir, { recursive: true })
-    const gdal2tilesArgs = [
-      '--resume',
-      '--processes', processes.toString(),
-      '--zoom', tileConfig.minZoom + '-' + tileConfig.maxZoom,
-      '--xyz',
-      '--s_srs', yearObject.srs,
-      '--tiledriver', tiledriver,
-      DOWNLOAD_DIR + '/' + vrtfile,
-      tilesDir
-    ]
-    await spawn('gdal2tiles', gdal2tilesArgs, {
-      stdout: 'inherit'
-    })
+    await createTiles(year, yearConfig, DOWNLOAD_DIR, TILES_BASE_DIR + '/' + year, logPrefix)
   }
 }
