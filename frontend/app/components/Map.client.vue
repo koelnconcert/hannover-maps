@@ -79,6 +79,7 @@ const minZoom = ref(12)
 const maxZoom = ref(22)
 const center = ref<PointExpression>([52.4, 9.7])
 const maxBounds = ref([[52.2, 9.6], [53, 10]])
+// TODO read from sources
 const dopOptions = {
   minNativeZoom: 12,
   maxNativeZoom: 19
