@@ -9,7 +9,7 @@ const arrayToObject = (array, mapper) => Object.fromEntries(array.map(key => [ke
 
 // source: https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover/Dezernate-und-Fachbereiche-der-LHH/Stadtentwicklung-und-Bauen/Fachbereich-Planen-und-Stadtentwicklung/Geoinformation/Open-GeoData/Nutzungsbedingungen
 const defaultLicense = {
-  name: 'Creative Commons Namensnennung 4.0 DE',
+  name: 'CC BY 4.0',
   url: 'https://creativecommons.org/licenses/by/4.0/deed.de',
   holder: 'Bereich Geoinformation – LH Hannover'
 }
