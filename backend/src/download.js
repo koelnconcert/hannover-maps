@@ -10,7 +10,7 @@ import { createTiles, createVrt } from './gdal.js'
 const DOWNLOAD_BASE_DIR = 'download'
 const TILES_BASE_DIR = 'public/tiles'
 
-async function processYearsParts(sourceId, sourceConfig, logger) {
+async function processYearsPartsZip(sourceId, sourceConfig, logger) {
   for (const [year, yearConfig] of Object.entries(sourceConfig.years)) {
     const yearLogger = logger.createLogger(year)
     
@@ -35,7 +35,7 @@ for (const [sourceId, sourceConfig] of Object.entries(sources)) {
   logger.log(`"${sourceConfig.name}"`)
   const type = sourceConfig.type
   if (type === 'years/parts/zip') {
-    await processYearsParts(sourceId, sourceConfig, logger)
+    await processYearsPartsZip(sourceId, sourceConfig, logger)
   } else {
     logger.log(`ERROR: unknown type ${type}`)
   }
