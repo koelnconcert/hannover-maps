@@ -21,18 +21,22 @@ const tiledriverForExtension = {
   jpg: 'JPEG'
 }
 
+const _log = (f, breadcrumbs, msg) => f(breadcrumbs.join('/') + ' > ' + msg)
+const log = (...args) => _log(console.log, ...args)
+const logReplace = (...args) => _log(logUpdate, ...args)
+
 for (const [sourceId, source] of Object.entries(sources)) {
-  console.log(source.name)
+  log([sourceId], `"${source.name}"`)
   for (const [year, yearObject] of Object.entries(source.years)) {
-    console.log('  ' + year)
+    const logPrefix = [sourceId, year]
     for (const [part, partObject] of Object.entries(yearObject.parts)) {
-      console.log('    ' + part)
+      const logPrefixPart = logPrefix.concat(part)
       const name = year + '_' + part
       const file = name + '.zip'
       const fullFilename = DOWNLOAD_DIR + '/' + file
 
       if (fs.existsSync(fullFilename)) {
-        console.log(`      downloading skipped, because ${file} already exists`)
+        log(logPrefixPart, `downloading skipped, because ${file} already exists`)
       } else {
         const url = partObject.downloadUrl
         const downloader = new Downloader({
@@ -40,7 +44,7 @@ for (const [sourceId, source] of Object.entries(sources)) {
           directory: DOWNLOAD_DIR,
           fileName: file,
           onProgress: function (percentage, chunk, remainingSize) {
-            logUpdate('      downloading ' + url + ' ' + percentage + '%')
+            logReplace(logPrefixPart, `downloading ${url}: ${percentage}%`)
           }
         })
         await downloader.download()
@@ -48,15 +52,15 @@ for (const [sourceId, source] of Object.entries(sources)) {
 
       const extractDir = DOWNLOAD_DIR + '/' + name
       if (fs.existsSync(extractDir)) {
-        console.log(`      unzipping skipped, because directory ${name} already exists`)
+        log(logPrefixPart, `unzipping skipped, because directory ${name} already exists`)
       } else {
-        console.log(`      unzipping ${file} to directory ${name}`)
+        log(logPrefixPart, `unzipping ${file} to directory ${name}`)
         await decompress(fullFilename, extractDir)
       }
     }
 
     const vrtfile = year + '.vrt'
-    console.log('    creating ' + vrtfile)
+    log(logPrefix, 'creating ' + vrtfile)
     execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
 
     const tileConfig = yearObject.tiles
@@ -64,7 +68,7 @@ for (const [sourceId, source] of Object.entries(sources)) {
     const processes = Math.floor(os.cpus().length * 3 / 4 )
     const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
     const tilesDir = TILES_BASE_DIR + '/' + year
-    console.log(`    converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
+    log(logPrefix, `converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
     fs.mkdirSync(tilesDir, { recursive: true })
     const gdal2tilesArgs = [
       '--resume',
