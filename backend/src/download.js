@@ -20,8 +20,8 @@ async function processYearsParts(sourceId, sourceConfig, logger) {
     for (const [part, partConfig] of Object.entries(yearConfig.parts)) {
       const partLogger = yearLogger.createLogger(part)
       const zipfile = downloadDir + '/' + part + '.zip'
-      await download(partConfig.url, zipfile, partLogger)
-      await unzip(zipfile, downloadDir + '/' + part, yearLogger)
+      await download(partConfig.downloadUrl, zipfile, partLogger)
+      await unzip(zipfile, yearLogger)
     }
 
     createVrt(downloadDir, yearLogger)

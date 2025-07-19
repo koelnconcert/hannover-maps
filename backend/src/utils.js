@@ -24,11 +24,12 @@ export async function download(url, filename, logger) {
   await downloader.download()
 }
 
-export async function unzip(filename, extractDir, logger) {
+export async function unzip(filename, logger) {
+  const extractDir = filename.replace(/.zip$/, '')
   if (fs.existsSync(extractDir)) {
     logger.log(`unzipping skipped, because directory ${extractDir} already exists`)
   } else {
-    logger.log(`unzipping ${file} to directory ${extractDir}`)
+    logger.log(`unzipping ${filename} to directory ${extractDir}`)
     await decompress(filename, extractDir)
   }
 }
