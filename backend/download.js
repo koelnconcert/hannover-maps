@@ -11,10 +11,14 @@ import sources from './sources.js'
 
 // console.debug(JSON.stringify(sources, null, 2))
 
-const DOWNLOAD_DIR = 'download/dop'
-const TILES_BASE_DIR = 'public/tiles/dop'
-fs.mkdirSync(DOWNLOAD_DIR, { recursive: true })
-fs.mkdirSync(TILES_BASE_DIR, { recursive: true })
+const DOWNLOAD_BASE_DIR = 'download'
+const TILES_BASE_DIR = 'public/tiles'
+
+function mkDir(...paths) {
+  const dir = paths.join('/')
+  fs.mkdirSync(dir, { recursive: true })
+  return dir
+}
 
 const tiledriverForExtension = {
   webp: 'WEBP',
@@ -57,7 +61,7 @@ async function downloadPart(partId, partConfig, downloadDir, logPrefix) {
 async function createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix) {
   const vrtfile = year + '.vrt'
   log(logPrefix, 'creating ' + vrtfile)
-  execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
+  execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: downloadDir })
 
   const tileConfig = yearConfig.tiles
 
@@ -84,9 +88,16 @@ for (const [sourceId, source] of Object.entries(sources)) {
   log([sourceId], `"${source.name}"`)
   for (const [year, yearConfig] of Object.entries(source.years)) {
     const logPrefix = [sourceId, year]
+    
+    const downloadDir = mkDir(DOWNLOAD_BASE_DIR, sourceId)
+    const tilesDir = mkDir(TILES_BASE_DIR, sourceId, year)
+    fs.mkdirSync(downloadDir, { recursive: true })
+    fs.mkdirSync(tilesDir, { recursive: true })
+
     for (const [partId, partConfig] of Object.entries(yearConfig.parts)) {
-      await downloadPart(partId, partConfig, DOWNLOAD_DIR, logPrefix.concat(partId))
+      await downloadPart(partId, partConfig, downloadDir, logPrefix.concat(partId))
     }
-    await createTiles(year, yearConfig, DOWNLOAD_DIR, TILES_BASE_DIR + '/' + year, logPrefix)
+
+    await createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix)
   }
 }
