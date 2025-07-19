@@ -2,7 +2,7 @@
   "name": "hannover-maps-backend",
   "scripts": {
     "dev": "http-server public --port 3001",
-    "download": "node download.js"
+    "download": "node src/download.js"
   },
   "type": "module",
   "dependencies": {
