@@ -1,4 +1,4 @@
-import fs from 'node:fs'
+import fs from 'node:fs/promises'
 
 import sources from './sources.js'
 import { createLogger } from './logger.js'
@@ -41,4 +41,4 @@ for (const [sourceId, sourceConfig] of Object.entries(sources)) {
   }
 }
 
-fs.writeFileSync(TILES_BASE_DIR + '/sources.json', JSON.stringify(sources, null, 2))
+await fs.writeFile(TILES_BASE_DIR + '/sources.json', JSON.stringify(sources, null, 2))
