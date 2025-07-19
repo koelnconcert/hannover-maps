@@ -30,7 +30,7 @@ const log = (...args) => _log(console.log, ...args)
 const logReplace = (...args) => _log(logUpdate, ...args)
 
 async function downloadPart(partId, partConfig, downloadDir, logPrefix) {
-  const name = logPrefix[1] + '_' + partId
+  const name = partId
   const file = name + '.zip'
   const fullFilename = downloadDir + '/' + file
 
@@ -61,7 +61,7 @@ async function downloadPart(partId, partConfig, downloadDir, logPrefix) {
 async function createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix) {
   const vrtfile = year + '.vrt'
   log(logPrefix, 'creating ' + vrtfile)
-  execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: downloadDir })
+  execSync(`gdalbuildvrt ${vrtfile} */*.jpg`, { cwd: downloadDir })
 
   const tileConfig = yearConfig.tiles
 
@@ -89,7 +89,7 @@ for (const [sourceId, source] of Object.entries(sources)) {
   for (const [year, yearConfig] of Object.entries(source.years)) {
     const logPrefix = [sourceId, year]
     
-    const downloadDir = mkDir(DOWNLOAD_BASE_DIR, sourceId)
+    const downloadDir = mkDir(DOWNLOAD_BASE_DIR, sourceId, year)
     const tilesDir = mkDir(TILES_BASE_DIR, sourceId, year)
     fs.mkdirSync(downloadDir, { recursive: true })
     fs.mkdirSync(tilesDir, { recursive: true })
