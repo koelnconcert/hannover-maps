@@ -53,31 +53,31 @@ for (const [sourceId, source] of Object.entries(sources)) {
         console.log(`      unzipping ${file} to directory ${name}`)
         await decompress(fullFilename, extractDir)
       }
-
-      const vrtfile = year + '.vrt'
-      console.log('    creating ' + vrtfile)
-      execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
-
-      const tileConfig = yearObject.tiles
-
-      const processes = Math.floor(os.cpus().length * 3 / 4 )
-      const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
-      const tilesDir = TILES_BASE_DIR + '/' + year
-      console.log(`    converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
-      fs.mkdirSync(tilesDir, { recursive: true })
-      const gdal2tilesArgs = [
-        '--resume',
-        '--processes', processes.toString(),
-        '--zoom', tileConfig.minZoom + '-' + tileConfig.maxZoom,
-        '--xyz',
-        '--s_srs', yearObject.srs,
-        '--tiledriver', tiledriver,
-        DOWNLOAD_DIR + '/' + vrtfile,
-        tilesDir
-      ]
-      await spawn('gdal2tiles', gdal2tilesArgs, {
-        stdout: 'inherit'
-      })
     }
+
+    const vrtfile = year + '.vrt'
+    console.log('    creating ' + vrtfile)
+    execSync(`gdalbuildvrt ${vrtfile} ${year}_*/*.jpg`, { cwd: DOWNLOAD_DIR })
+
+    const tileConfig = yearObject.tiles
+
+    const processes = Math.floor(os.cpus().length * 3 / 4 )
+    const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
+    const tilesDir = TILES_BASE_DIR + '/' + year
+    console.log(`    converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
+    fs.mkdirSync(tilesDir, { recursive: true })
+    const gdal2tilesArgs = [
+      '--resume',
+      '--processes', processes.toString(),
+      '--zoom', tileConfig.minZoom + '-' + tileConfig.maxZoom,
+      '--xyz',
+      '--s_srs', yearObject.srs,
+      '--tiledriver', tiledriver,
+      DOWNLOAD_DIR + '/' + vrtfile,
+      tilesDir
+    ]
+    await spawn('gdal2tiles', gdal2tilesArgs, {
+      stdout: 'inherit'
+    })
   }
 }
