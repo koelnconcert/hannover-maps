@@ -30,12 +30,37 @@ async function processYearsPartsZip(sourceId, sourceConfig, logger) {
   }
 }
 
+async function processZipYears(sourceId, sourceConfig, logger) {
+  const downloadDir = mkDir(DOWNLOAD_BASE_DIR)
+  const zipfile = downloadDir + '/' + sourceId + '.zip'
+  await download(sourceConfig.downloadUrl, zipfile, logger)
+  await unzip(zipfile, logger)
+
+  const unzipDir = downloadDir + '/' + sourceId
+  const yearsPattern = new RegExp(sourceConfig.yearsPattern)
+  const files = await fs.readdir(unzipDir)
+  const jpegs = files.filter(filename => filename.endsWith('.jpg'))
+  for (const jpeg of jpegs) {
+    const year = yearsPattern.exec(jpeg)?.groups.year
+    if (!year) {
+      logger.log(`cannot get year from file '${jpeg}'`)
+    }
+    const yearLogger = logger.createLogger(year)
+    const vrtFile = `${unzipDir}/${year}.vrt`
+    const tilesDir = mkDir(TILES_BASE_DIR, sourceId, year)
+    createVrt(vrtFile, year + '_*.jpg', yearLogger)
+    await createTiles(vrtFile, tilesDir, sourceConfig.tiles, yearLogger)
+  }
+}
+
 for (const [sourceId, sourceConfig] of Object.entries(sources)) {
   const logger = createLogger(sourceId)
   logger.log(`"${sourceConfig.name}"`)
   const type = sourceConfig.type
   if (type === 'years/parts/zip') {
     await processYearsPartsZip(sourceId, sourceConfig, logger)
+  } else if (type === 'zip/years') {
+    await processZipYears(sourceId, sourceConfig, logger)
   } else {
     logger.log(`ERROR: unknown type ${type}`)
   }

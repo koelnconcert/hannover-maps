@@ -36,7 +36,17 @@ const sources = {
     }))
   },
   skh: {
-    name: 'Stadtkarte 1:20 000 (historisch)'
+    name: 'Stadtkarte 1:20 000 (historisch)',
+    type: 'zip/years',
+    yearsPattern: '^(?<year>[0-9]+)_',
+    website: openGeoDataWebsiteBaseUrl + '/Digitale-Stadtkarten/Stadtkarte-1-20-000-historisch',
+    downloadUrl: downloadBaseUrl + '/SKH20_historisch.zip',
+    tiles: {
+      sourceSrs: 'EPSG:25832',
+      minZoom: 12,
+      maxZoom: 17,
+      fileExtension: 'webp'
+    }
   }
 }
 
