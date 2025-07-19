@@ -3,9 +3,9 @@
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="minZoom" :maxZoom="maxZoom">
       <template v-for="(year, index) in years" :key="year">
-        <LTileLayer :url="config.public.tileBaseUrl + 'dop/' + year + '/{z}/{x}/{y}.' + (year <= 2002 ? 'jpg' : 'webp')" layer-type="overlay"
+        <LTileLayer :url="config.public.tileBaseUrl + 'dop/' + year + '/{z}/{x}/{y}.' + sources.dop.years[year].tiles.fileExtension" layer-type="overlay"
           :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" :options="dopOptions"
-          :attribution="attribution.dop"/>
+          :attribution="sourceToAttribution('dop', year)"/>
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
@@ -94,13 +94,13 @@ const grayscale = ref(false)
 const preload = ref(true)
 const debugGrid = ref(false)
 
-const dopUrl='https://www.hannover.de/Leben-in-der-Region-Hannover/Verwaltungen-Kommunen/Die-Verwaltung-der-Landeshauptstadt-Hannover/Dezernate-und-Fachbereiche-der-LHH/Stadtentwicklung-und-Bauen/Fachbereich-Planen-und-Stadtentwicklung/Geoinformation/Open-GeoData/Digitale-Orthophotos-DOP20'
 const attribution = {
   openstreetmap: '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-  dop: `<a href="${dopUrl}">Digitale Orthophotos (DOP20)</a> (<a href="https://creativecommons.org/licenses/by/4.0/deed.de">Creative Commons Namensnennung 4.0 DE</a> Landeshauptstadt Hannover, FB Planen und Stadtentwicklung, Bereich Geoinformation)`
 }
 
-const years = ref([1957, 1965, 1977, 1981, 1991, 2002, 2006, 2015, 2021, 2023])
+const { data: sources } = await useFetch(config.public.tileBaseUrl + 'sources.json')
+
+const years = computed(() => Object.keys(sources.value?.dop.years ?? {}))
 
 const yearDisplay = computed(() => {
   const yy = yearsOpacity.value.entries()
@@ -174,6 +174,20 @@ const debugGridLayer = function (props: any) {
     )
   }
 }
+
+function sourceToAttribution(source, year) {
+  const sourceConfig = sources.value[source]
+  if (!sourceConfig) {
+    return 'undefined'
+  }
+  let attribution = `<a href="${sourceConfig.website}">${sourceConfig.name}</a>`
+  const license = sourceConfig.years[year]?.license
+  if (license) {
+    attribution += ` by ${license.holder} (<a href="${license.url}">${license.name}</a>)`
+  }
+  return attribution
+}
+
 </script>
 
 <style scoped>

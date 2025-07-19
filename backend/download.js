@@ -106,3 +106,5 @@ for (const [sourceId, source] of Object.entries(sources)) {
     await createTiles(yearConfig, downloadDir, tilesDir, logPrefix)
   }
 }
+
+fs.writeFileSync(TILES_BASE_DIR + '/sources.json', JSON.stringify(sources, null, 2))
