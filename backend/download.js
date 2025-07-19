@@ -48,7 +48,10 @@ async function downloadPart(partId, partConfig, downloadDir, logPrefix) {
     })
     await downloader.download()
   }
-  
+}
+
+async function unzipPart(name, downloadDir, logPrefix) {
+  const fullFilename = downloadDir + '/' + name + '.zip'
   const extractDir = downloadDir + '/' + name
   if (fs.existsSync(extractDir)) {
     log(logPrefix, `unzipping skipped, because directory ${name} already exists`)
@@ -58,17 +61,17 @@ async function downloadPart(partId, partConfig, downloadDir, logPrefix) {
   }
 }
 
-async function createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix) {
-  const vrtfile = year + '.vrt'
+function createVrt(downloadDir, logPrefix) {
+  const vrtfile = 'all.vrt'
   log(logPrefix, 'creating ' + vrtfile)
   execSync(`gdalbuildvrt ${vrtfile} */*.jpg`, { cwd: downloadDir })
+}
 
+async function createTiles(yearConfig, downloadDir, tilesDir, logPrefix) {
   const tileConfig = yearConfig.tiles
-
   const processes = Math.floor(os.cpus().length * 3 / 4 )
   const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
   log(logPrefix, `converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
-  fs.mkdirSync(tilesDir, { recursive: true })
   const gdal2tilesArgs = [
     '--resume',
     '--processes', processes.toString(),
@@ -76,7 +79,7 @@ async function createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix) {
     '--xyz',
     '--s_srs', yearConfig.srs,
     '--tiledriver', tiledriver,
-    downloadDir + '/' + vrtfile,
+    downloadDir + '/all.vrt',
     tilesDir
   ]
   await spawn('gdal2tiles', gdal2tilesArgs, {
@@ -96,8 +99,10 @@ for (const [sourceId, source] of Object.entries(sources)) {
 
     for (const [partId, partConfig] of Object.entries(yearConfig.parts)) {
       await downloadPart(partId, partConfig, downloadDir, logPrefix.concat(partId))
+      await unzipPart(partId, downloadDir, logPrefix.concat(partId))
     }
 
-    await createTiles(year, yearConfig, downloadDir, tilesDir, logPrefix)
+    createVrt(downloadDir, logPrefix)
+    await createTiles(yearConfig, downloadDir, tilesDir, logPrefix)
   }
 }
