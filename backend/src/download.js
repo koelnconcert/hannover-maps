@@ -24,8 +24,9 @@ async function processYearsParts(sourceId, sourceConfig, logger) {
       await unzip(zipfile, yearLogger)
     }
 
-    createVrt(downloadDir, yearLogger)
-    await createTiles(downloadDir, tilesDir, yearConfig.tiles, yearLogger)
+    const vrtFile = downloadDir + '/all.vrt'
+    createVrt(vrtFile, '*/*.jpg', yearLogger)
+    await createTiles(vrtFile, tilesDir, yearConfig.tiles, yearLogger)
   }
 }
 

@@ -1,21 +1,20 @@
 import os from 'node:os'
+import path from 'node:path'
 import { execSync } from 'node:child_process'
 
 import spawn from 'nano-spawn'
-
-const VRT_FILENAME = 'all.vrt'
 
 const tiledriverForExtension = {
   webp: 'WEBP',
   jpg: 'JPEG'
 }
 
-export function createVrt(directory, loggger) {
-  loggger.log('creating ' + VRT_FILENAME)
-  execSync(`gdalbuildvrt ${VRT_FILENAME} */*.jpg`, { cwd: directory })
+export function createVrt(vrtFile, glob, loggger) {
+  loggger.log('creating ' + vrtFile)
+  execSync(`gdalbuildvrt ${path.basename(vrtFile)} ${glob}`, { cwd: path.dirname(vrtFile) })
 }
 
-export async function createTiles(downloadDir, tilesDir, tileConfig, logger) {
+export async function createTiles(vrtFile, tilesDir, tileConfig, logger) {
   const processes = Math.floor(os.cpus().length * 3 / 4 )
   const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
   logger.log(`converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
@@ -26,7 +25,7 @@ export async function createTiles(downloadDir, tilesDir, tileConfig, logger) {
     '--xyz',
     '--s_srs', tileConfig.sourceSrs,
     '--tiledriver', tiledriver,
-    downloadDir + '/' + VRT_FILENAME,
+    vrtFile,
     tilesDir
   ]
   await spawn('gdal2tiles', gdal2tilesArgs, {
