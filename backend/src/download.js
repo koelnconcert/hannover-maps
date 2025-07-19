@@ -2,12 +2,11 @@ import fs from 'node:fs'
 import os from 'node:os'
 import { execSync } from 'node:child_process'
 
-import { Downloader } from 'nodejs-file-downloader'
-import decompress from 'decompress'
 import spawn from 'nano-spawn'
 
 import sources from './sources.js'
 import { createLogger } from './logger.js'
+import { download, mkDir, unzip } from './utils.js'
 
 // console.debug(JSON.stringify(sources, null, 2))
 
@@ -20,36 +19,6 @@ const tiledriverForExtension = {
 }
 
 const VRT_FILENAME = 'all.vrt'
-
-function mkDir(...paths) {
-  const dir = paths.join('/')
-  fs.mkdirSync(dir, { recursive: true })
-  return dir
-}
-
-async function download(url, filename, logger) {
-  if (fs.existsSync(filename)) {
-    logger.log(`downloading skipped, because ${filename} already exists`)
-    return
-  }
-  const downloader = new Downloader({
-    url,
-    fileName: filename,
-    onProgress: function (percentage, chunk, remainingSize) {
-      logger.logReplace(`downloading ${url}: ${percentage}%`)
-    }
-  })
-  await downloader.download()
-}
-
-async function unzip(filename, extractDir, logger) {
-  if (fs.existsSync(extractDir)) {
-    logger.log(`unzipping skipped, because directory ${extractDir} already exists`)
-  } else {
-    logger.log(`unzipping ${file} to directory ${extractDir}`)
-    await decompress(filename, extractDir)
-  }
-}
 
 function createVrt(directory, loggger) {
   loggger.log('creating ' + VRT_FILENAME)
