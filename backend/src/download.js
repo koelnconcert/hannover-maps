@@ -19,9 +19,14 @@ const tiledriverForExtension = {
   jpg: 'JPEG'
 }
 
-const _log = (f, breadcrumbs, msg) => f(breadcrumbs.join('/') + ' > ' + msg)
-const log = (...args) => _log(console.log, ...args)
-const logReplace = (...args) => _log(logUpdate, ...args)
+function createLogger(...breadcrumbs) {
+  const prefix = breadcrumbs.join('/') + ' > '
+  return {
+    log: (msg) => console.log(prefix + msg),
+    logReplace: (msg) => logUpdate(prefix + msg),
+    createLogger: (...additionalBreadcrumbs) => createLogger(...breadcrumbs, ...additionalBreadcrumbs)
+  }
+}
 
 const VRT_FILENAME = 'all.vrt'
 
@@ -31,39 +36,39 @@ function mkDir(...paths) {
   return dir
 }
 
-async function download(url, filename, logPrefix) {
+async function download(url, filename, logger) {
   if (fs.existsSync(filename)) {
-    log(logPrefix, `downloading skipped, because ${filename} already exists`)
+    logger.log(`downloading skipped, because ${filename} already exists`)
     return
   }
   const downloader = new Downloader({
     url,
     fileName: filename,
     onProgress: function (percentage, chunk, remainingSize) {
-      logReplace(logPrefix, `downloading ${url}: ${percentage}%`)
+      logger.logReplace(`downloading ${url}: ${percentage}%`)
     }
   })
   await downloader.download()
 }
 
-async function unzip(filename, extractDir, logPrefix) {
+async function unzip(filename, extractDir, logger) {
   if (fs.existsSync(extractDir)) {
-    log(logPrefix, `unzipping skipped, because directory ${extractDir} already exists`)
+    logger.log(`unzipping skipped, because directory ${extractDir} already exists`)
   } else {
-    log(logPrefix, `unzipping ${file} to directory ${extractDir}`)
+    logger.log(`unzipping ${file} to directory ${extractDir}`)
     await decompress(filename, extractDir)
   }
 }
 
-function createVrt(directory, logPrefix) {
-  log(logPrefix, 'creating ' + VRT_FILENAME)
+function createVrt(directory, loggger) {
+  loggger.log('creating ' + VRT_FILENAME)
   execSync(`gdalbuildvrt ${VRT_FILENAME} */*.jpg`, { cwd: directory })
 }
 
-async function createTiles(downloadDir, tilesDir, tileConfig, logPrefix) {
+async function createTiles(downloadDir, tilesDir, tileConfig, logger) {
   const processes = Math.floor(os.cpus().length * 3 / 4 )
   const tiledriver = tiledriverForExtension[tileConfig.fileExtension]
-  log(logPrefix, `converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
+  logger.log(`converting to ${tiledriver} tiles with ${processes} threads to directory ${tilesDir}`)
   const gdal2tilesArgs = [
     '--resume',
     '--processes', processes.toString(),
@@ -80,21 +85,23 @@ async function createTiles(downloadDir, tilesDir, tileConfig, logPrefix) {
 }
 
 for (const [sourceId, source] of Object.entries(sources)) {
-  log([sourceId], `"${source.name}"`)
+  const sourceLogger = createLogger(sourceId)
+  sourceLogger.log(`"${source.name}"`)
   for (const [year, yearConfig] of Object.entries(source.years)) {
-    const logPrefix = [sourceId, year]
+    const yearLogger = sourceLogger.createLogger(year)
     
     const downloadDir = mkDir(DOWNLOAD_BASE_DIR, sourceId, year)
     const tilesDir = mkDir(TILES_BASE_DIR, sourceId, year)
 
-    for (const [partId, partConfig] of Object.entries(yearConfig.parts)) {
-      const zipfile = downloadDir + '/' + partId + '.zip'
-      await download(partConfig.url, zipfile, logPrefix.concat(partId))
-      await unzip(zipfile, downloadDir + '/' + partId, logPrefix.concat(partId))
+    for (const [part, partConfig] of Object.entries(yearConfig.parts)) {
+      const partLogger = yearLogger.createLogger(part)
+      const zipfile = downloadDir + '/' + part + '.zip'
+      await download(partConfig.url, zipfile, partLogger)
+      await unzip(zipfile, downloadDir + '/' + part, yearLogger)
     }
 
-    createVrt(downloadDir, logPrefix)
-    await createTiles(downloadDir, tilesDir, yearConfig.tiles, logPrefix)
+    createVrt(downloadDir, yearLogger)
+    await createTiles(downloadDir, tilesDir, yearConfig.tiles, yearLogger)
   }
 }
 
