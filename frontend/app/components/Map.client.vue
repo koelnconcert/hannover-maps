@@ -2,7 +2,7 @@
   <div class="w-screen h-screen" :class="{ grayscaleForLayers : grayscale }">
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="config.minZoom" :maxZoom="config.maxZoom">
-      <MapSourceLayerMultipleYears
+      <LayerMultipleYears
          :source="sourceSelected"
          :year-slider="yearSlider"
          :year-slider-deadzone="yearSliderDeadzone"
