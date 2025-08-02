@@ -45,6 +45,7 @@ async function processZipYears(sourceId, sourceConfig, logger) {
     if (!year) {
       logger.log(`cannot get year from file '${jpeg}'`)
     }
+    sourceConfig.years[year] = {}
     const yearLogger = logger.createLogger(year)
     const vrtFile = `${unzipDir}/${year}.vrt`
     const tilesDir = mkDir(TILES_BASE_DIR, sourceId, year)

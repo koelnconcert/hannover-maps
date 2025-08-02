@@ -16,6 +16,7 @@ const defaultLicense = {
 
 const sources = {
   dop: {
+    key: 'dop',
     name: 'Digitale Orthophotos (DOP20)',
     type: 'years/parts/zip',
     website: dopWebsiteBaseUrl,
@@ -36,6 +37,7 @@ const sources = {
     }))
   },
   skh: {
+    key: 'skh',
     name: 'Stadtkarte 1:20 000 (historisch)',
     type: 'zip/years',
     yearsPattern: '^(?<year>[0-9]+)_',
@@ -46,7 +48,8 @@ const sources = {
       minZoom: 12,
       maxZoom: 17,
       fileExtension: 'webp'
-    }
+    },
+    years: {}
   }
 }
 

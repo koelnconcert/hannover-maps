@@ -3,9 +3,9 @@
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="minZoom" :maxZoom="maxZoom">
       <template v-for="(year, index) in years" :key="year">
-        <LTileLayer :url="config.public.tileBaseUrl + 'dop/' + year + '/{z}/{x}/{y}.' + sources.dop.years[year].tiles.fileExtension" layer-type="overlay"
-          :name="'DOP ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" :options="dopOptions"
-          :attribution="sourceToAttribution('dop', year)"/>
+        <LTileLayer :url="sourceToTilesUrl(sourceSelected, year)" layer-type="overlay"
+          :name="sourceSelectedKey + ' ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" :options="dopOptions"
+          :attribution="sourceToAttribution(sourceSelected, year)"/>
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
@@ -17,6 +17,10 @@
           <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
           {{ baseOpacity.toFixed(2) }}
 
+          <span>Layer</span>
+          <USelect v-model="sourceSelectedKey" :items="sourceSelection"/>
+          <span>{{ sourceSelectedKey ?? '&nbsp;' }}</span>
+
           <span>Jahr</span>
           <div class="flex gap-2">
             <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="yearSliderStep" size="sm" :disabled="playing"/>
@@ -27,7 +31,7 @@
               <UButton variant="outline" icon="i-lucide-chevron-last" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider = years.length - 1"/>
             </UButtonGroup>
           </div>
-          {{ yearDisplay }}
+          <span>{{ yearDisplay ?? '&nbsp;' }}</span>
 
           <span>Jahr-Deadzone</span>
           <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm"/>
@@ -82,7 +86,7 @@ const maxBounds = ref([[52.2, 9.6], [53, 10]])
 // TODO read from sources
 const dopOptions = {
   minNativeZoom: 12,
-  maxNativeZoom: 19
+  maxNativeZoom: 17
 }
 
 const baseOpacity = ref(0.2)
@@ -101,7 +105,23 @@ const attribution = {
 
 const { data: sources } = await useFetch(config.public.tileBaseUrl + 'sources.json')
 
-const years = computed(() => Object.keys(sources.value?.dop.years ?? {}))
+const sourceSelection = computed(() => {
+  if (!sources.value) {
+    return []
+  }
+  return Object.entries(sources.value)
+    .map(([key, value]) => ({
+      value: key,
+      label: value.name
+    }))
+})
+const sourceSelectedKey = ref('dop')
+const sourceSelected = computed(() => sources.value?.[sourceSelectedKey.value])
+watch(sourceSelected, () => {
+  yearSlider.value = 0
+})
+
+const years = computed(() => Object.keys(sourceSelected.value?.years ?? {}).sort())
 
 const yearDisplay = computed(() => {
   const yy = yearsOpacity.value.entries()
@@ -176,8 +196,12 @@ const debugGridLayer = function (props: any) {
   }
 }
 
-function sourceToAttribution(source, year) {
-  const sourceConfig = sources.value[source]
+function sourceToTilesUrl(sourceConfig, year) {
+  const tilesConfig = sourceConfig.years?.[year]?.tiles ?? sourceConfig.tiles
+  return config.public.tileBaseUrl + sourceConfig.key + '/' + year + '/{z}/{x}/{y}.' + tilesConfig.fileExtension
+}
+
+function sourceToAttribution(sourceConfig, year) {
   if (!sourceConfig) {
     return 'undefined'
   }
