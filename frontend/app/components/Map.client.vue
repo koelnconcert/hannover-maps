@@ -10,10 +10,10 @@
          :preload="preload"
          @return:year-display="yearDisplay = $event"
       />
-      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :min-zoom="config.minZoom" :max-zoom="config.maxZoom" :z-index="999" :options="{ minNativeZoom: config.minZoom, maxNativeZoom: 18}"
+      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :min-zoom="config.minZoom" :max-zoom="config.maxZoom" :z-index="800" :options="{ minNativeZoom: config.minZoom, maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
       />
-      <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
+      <LayerDebug :visible="debugGrid" :z-index="900"/>
       <MapBox position-x="center" position-y="top" class="p-3">
         <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
           <span>Transparenz</span>
@@ -77,7 +77,7 @@
 <script lang="ts" setup>
 import "leaflet/dist/leaflet.css"
 import type { PointExpression } from "leaflet"
-import { LMap, LTileLayer, LGridLayer } from "@vue-leaflet/vue-leaflet"
+import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
 
 const config = useConfig()
 
@@ -148,15 +148,6 @@ watch(playing, (enabled) => {
     }
   }, 1000 * playingSpeed.value * yearSliderStep.value)
 })
-
-const debugGridLayer = function (props: any) {
-  return () => {
-    return h("div",
-      { style: "border: 1px solid black; height: 100%; color: black;" },
-      [props.coords.z, props.coords.x, props.coords.y].join('/')
-    )
-  }
-}
 
 </script>
 
