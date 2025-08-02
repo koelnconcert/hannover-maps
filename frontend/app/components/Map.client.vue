@@ -8,7 +8,7 @@
           :year="Number(year)"
           :visible="preload || yearsOpacity[index] > 0" 
           :opacity="yearsOpacity[index]" 
-          :z-index="1" 
+          :z-index="100 + index" 
         />
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="config.maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
