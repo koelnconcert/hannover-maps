@@ -88,7 +88,6 @@ const maxBounds = ref([[52.2, 9.6], [53, 10]])
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
 const yearSliderDeadzone = ref(0.2)
-const playing = ref(false)
 const playingSpeed = ref(1)
 const fadeYears = ref(false)
 const grayscale = ref(false)
@@ -128,25 +127,11 @@ watch(fadeYears, (enabled) => {
   }
 })
 
-let playingInterval : (NodeJS.Timeout | undefined) = undefined
-watch(playing, (enabled) => {
-  if (!enabled) {
-    if (playingInterval) {
-      clearInterval(playingInterval)
-      playingInterval = undefined
-    }
-    return
-  }
-  if (yearSlider.value == years.value.length - 1) {
-    yearSlider.value = 0
-  }
-  playingInterval = setInterval(() => {
-    yearSlider.value += yearSliderStep.value
-    if (yearSlider.value >= years.value.length - 1) {
-      yearSlider.value = years.value.length - 1
-      playing.value = false
-    }
-  }, 1000 * playingSpeed.value * yearSliderStep.value)
+const playing = useIncrementPlayer(yearSlider, { 
+  speed: playingSpeed,
+  step: yearSliderStep,
+  min: 0,
+  max: computed(() => years.value.length - 1)
 })
 
 </script>
