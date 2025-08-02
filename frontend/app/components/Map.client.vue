@@ -2,15 +2,14 @@
   <div class="w-screen h-screen" :class="{ grayscaleForLayers : grayscale }">
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="config.minZoom" :maxZoom="config.maxZoom">
-      <template v-for="(year, index) in years" :key="year">
-        <MapSourceLayerSingle  
-          :source="sourceSelected"
-          :year="Number(year)"
-          :visible="preload || yearsOpacity[index] > 0" 
-          :opacity="yearsOpacity[index]" 
-          :z-index="100 + index" 
-        />
-      </template>
+      <MapSourceLayerMultipleYears
+         :source="sourceSelected"
+         :year-slider="yearSlider"
+         :year-slider-deadzone="yearSliderDeadzone"
+         :z-index-base="100"
+         :preload="preload"
+         @return:year-display="yearDisplay = $event"
+      />
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :min-zoom="config.minZoom" :max-zoom="config.maxZoom" :z-index="999" :options="{ minNativeZoom: config.minZoom, maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
       />
@@ -119,41 +118,7 @@ watch(sourceSelected, () => {
 })
 
 const years = computed(() => Object.keys(sourceSelected.value?.years ?? {}).sort())
-
-const yearDisplay = computed(() => {
-  const yy = yearsOpacity.value.entries()
-    .filter(([, value]) => value > 0)
-    .map(([index]) => years.value[index])
-  return Array.from(yy).join('/')
-})
-
-const yearsOpacity = computed(() => {
-  const value = yearSlider.value
-  const floor = Math.floor(value)
-  const ceil = Math.ceil(value)
-  const diff = value - floor
-  const deadzone = yearSliderDeadzone.value
-  const inUpperDeadzone = diff > 1 - deadzone
-  const inLowerDeadzone = diff < deadzone
-  return [...Array(years.value.length).keys()].map(i => {
-    if (i < floor || i > ceil) {
-      return 0
-    }
-    if (i == floor) {
-      return inUpperDeadzone ? 0 : 1
-    }
-    if (i == ceil) {
-      if (inLowerDeadzone) {
-        return 0
-      } else if (inUpperDeadzone) {
-        return 1
-      } else {
-        return (diff - deadzone) / (1 - 2 * deadzone )
-      }
-    }
-    return 0 // should not happen
-  })
-})
+const yearDisplay = ref('??')
 
 const yearSliderStep = computed(() => fadeYears.value ? 0.01 : 1)
 
