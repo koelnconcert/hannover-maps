@@ -11,7 +11,7 @@
           :z-index="100 + index" 
         />
       </template>
-      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="config.maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
+      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :min-zoom="config.minZoom" :max-zoom="config.maxZoom" :z-index="999" :options="{ minNativeZoom: config.minZoom, maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
       />
       <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
