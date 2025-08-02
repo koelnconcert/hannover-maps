@@ -4,7 +4,8 @@
       :minZoom="minZoom" :maxZoom="maxZoom">
       <template v-for="(year, index) in years" :key="year">
         <LTileLayer :url="sourceToTilesUrl(sourceSelected, year)" layer-type="overlay"
-          :name="sourceSelectedKey + ' ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" :options="dopOptions"
+          :name="sourceSelectedKey + ' ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" 
+          :options="sourceToLayerOptions(sourceSelected, year)"
           :attribution="sourceToAttribution(sourceSelected, year)"/>
       </template>
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
@@ -83,11 +84,6 @@ const minZoom = ref(12)
 const maxZoom = ref(22)
 const center = ref<PointExpression>([52.4, 9.7])
 const maxBounds = ref([[52.2, 9.6], [53, 10]])
-// TODO read from sources
-const dopOptions = {
-  minNativeZoom: 12,
-  maxNativeZoom: 17
-}
 
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
@@ -211,6 +207,14 @@ function sourceToAttribution(sourceConfig, year) {
     attribution += ` by ${license.holder} (<a href="${license.url}">${license.name}</a>)`
   }
   return attribution
+}
+
+function sourceToLayerOptions(sourceConfig, year) {
+  const tilesConfig = getFromYearOrSourceConfig(sourceConfig, year, 'tiles')
+  return {
+    minNativeZoom: tilesConfig.minZoom,
+    maxNativeZoom: tilesConfig.maxZoom
+  }
 }
 
 function getFromYearOrSourceConfig(sourceConfig, year, propName) {
