@@ -1,14 +1,17 @@
 <template>
   <div class="w-screen h-screen" :class="{ grayscaleForLayers : grayscale }">
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
-      :minZoom="minZoom" :maxZoom="maxZoom">
+      :minZoom="config.minZoom" :maxZoom="config.maxZoom">
       <template v-for="(year, index) in years" :key="year">
-        <LTileLayer :url="sourceToTilesUrl(sourceSelected, year)" layer-type="overlay"
-          :name="sourceSelectedKey + ' ' + year" :visible="preload || yearsOpacity[index] > 0" :opacity="yearsOpacity[index]" :min-zoom="minZoom" :max-zoom="maxZoom" :z-index="1" 
-          :options="sourceToLayerOptions(sourceSelected, year)"
-          :attribution="sourceToAttribution(sourceSelected, year)"/>
+        <MapSourceLayerSingle  
+          :source="sourceSelected"
+          :year="Number(year)"
+          :visible="preload || yearsOpacity[index] > 0" 
+          :opacity="yearsOpacity[index]" 
+          :z-index="1" 
+        />
       </template>
-      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
+      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :max-zoom="config.maxZoom" :z-index="2" :options="{ maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
       />
       <LGridLayer :visible="debugGrid" :child-render="debugGridLayer" layer-type="overlay" name="Debug Grid" :z-index="3"/>
@@ -77,11 +80,9 @@ import "leaflet/dist/leaflet.css"
 import type { PointExpression } from "leaflet"
 import { LMap, LTileLayer, LGridLayer } from "@vue-leaflet/vue-leaflet"
 
-const config = useRuntimeConfig()
+const config = useConfig()
 
 const zoom = ref(12)
-const minZoom = ref(12)
-const maxZoom = ref(22)
 const center = ref<PointExpression>([52.4, 9.7])
 const maxBounds = ref([[52.2, 9.6], [53, 10]])
 
@@ -190,35 +191,6 @@ const debugGridLayer = function (props: any) {
       [props.coords.z, props.coords.x, props.coords.y].join('/')
     )
   }
-}
-
-function sourceToTilesUrl(sourceConfig, year) {
-  const tilesConfig = getFromYearOrSourceConfig(sourceConfig, year, 'tiles')
-  return config.public.tileBaseUrl + sourceConfig.key + '/' + year + '/{z}/{x}/{y}.' + tilesConfig.fileExtension
-}
-
-function sourceToAttribution(sourceConfig, year) {
-  if (!sourceConfig) {
-    return 'undefined'
-  }
-  let attribution = `<a href="${sourceConfig.website}">${sourceConfig.name}</a>`
-  const license = getFromYearOrSourceConfig(sourceConfig, year, 'license')
-  if (license) {
-    attribution += ` by ${license.holder} (<a href="${license.url}">${license.name}</a>)`
-  }
-  return attribution
-}
-
-function sourceToLayerOptions(sourceConfig, year) {
-  const tilesConfig = getFromYearOrSourceConfig(sourceConfig, year, 'tiles')
-  return {
-    minNativeZoom: tilesConfig.minZoom,
-    maxNativeZoom: tilesConfig.maxZoom
-  }
-}
-
-function getFromYearOrSourceConfig(sourceConfig, year, propName) {
-  return sourceConfig.years?.[year]?.[propName] ?? sourceConfig[propName]
 }
 
 </script>
