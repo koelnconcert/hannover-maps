@@ -3,7 +3,7 @@
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="config.minZoom" :maxZoom="config.maxZoom">
       <LayerMultipleYears
-         :source="sourceSelected"
+         :source="source"
          :year-slider="yearSlider"
          :year-slider-deadzone="yearSliderDeadzone"
          :z-index-base="100"
@@ -15,57 +15,17 @@
       />
       <LayerDebug :visible="debugGrid" :z-index="900"/>
       <MapBox position-x="center" position-y="top" class="p-3">
-        <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
-          <span>Transparenz</span>
-          <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
-          {{ baseOpacity.toFixed(2) }}
-
-          <span>Layer</span>
-          <USelect v-model="sourceSelectedKey" :items="sourceSelection"/>
-          <span>{{ sourceSelectedKey ?? '&nbsp;' }}</span>
-
-          <span>Jahr</span>
-          <div class="flex gap-2">
-            <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="yearSliderStep" size="sm" :disabled="playing"/>
-            <UButtonGroup size="xs">
-              <UButton variant="outline" icon="i-lucide-chevron-first" :disabled="playing || yearSlider <= 0" @click="yearSlider = 0"/>
-              <UButton variant="outline" icon="i-lucide-chevron-left" :disabled="playing || yearSlider <= 0" @click="yearSlider--"/>
-              <UButton variant="outline" icon="i-lucide-chevron-right" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider++"/>
-              <UButton variant="outline" icon="i-lucide-chevron-last" :disabled="playing || yearSlider >= years.length - 1" @click="yearSlider = years.length - 1"/>
-            </UButtonGroup>
-          </div>
-          <span>{{ yearDisplay ?? '&nbsp;' }}</span>
-
-          <span>Jahr-Deadzone</span>
-          <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm"/>
-          {{ yearSliderDeadzone.toFixed(2) }}
-
-          <span>Animation</span>
-          <div class="flex gap-2">
-            <USlider v-model="playingSpeed" :min="1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
-            <UButton size="xs" variant="outline" :icon="playing ? 'i-lucide-pause' : 'i-lucide-play'" :disabled="yearSlider >= years.length" @click="playing = !playing"/>
-          </div>
-          <span>{{ playingSpeed }}s</span>
-
-        </div>
-        <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
-          <div class="flex gap-1">
-            <USwitch v-model="preload"/>
-            <span>Alle Jahre vorladen</span>
-          </div>
-          <div class="flex gap-1">
-            <USwitch v-model="fadeYears"/>
-            <span>Jahre überblenden</span>
-          </div>
-          <div class="flex gap-1">
-            <USwitch v-model="grayscale"/>
-            <span>nur Graustufen</span>
-          </div>
-          <div class="flex gap-1">
-            <USwitch v-model="debugGrid"/>
-            <span>Debug-Grid</span>
-          </div>
-        </div>
+        <ControlOptions 
+          v-model:source="source"
+          v-model:base-opacity="baseOpacity"
+          v-model:year-slider="yearSlider"
+          v-model:year-slider-deadzone="yearSliderDeadzone"
+          v-model:preload="preload"
+          v-model:grayscale="grayscale"
+          v-model:debug-grid="debugGrid"
+          :sources="sources"
+          :year-display="yearDisplay"
+        />
       </MapBox>
       <MapBox position-x="right" position-y="top" class="px-1 text-xl">
         {{ yearDisplay }}
@@ -88,8 +48,9 @@ const maxBounds = ref([[52.2, 9.6], [53, 10]])
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
 const yearSliderDeadzone = ref(0.2)
-const playingSpeed = ref(1)
-const fadeYears = ref(false)
+const yearDisplay = ref('??')
+const source = ref({})
+
 const grayscale = ref(false)
 const preload = ref(true)
 const debugGrid = ref(false)
@@ -99,41 +60,6 @@ const attribution = {
 }
 
 const { data: sources } = await useFetch(config.public.tileBaseUrl + 'sources.json')
-
-const sourceSelection = computed(() => {
-  if (!sources.value) {
-    return []
-  }
-  return Object.entries(sources.value)
-    .map(([key, value]) => ({
-      value: key,
-      label: value.name
-    }))
-})
-const sourceSelectedKey = ref('dop')
-const sourceSelected = computed(() => sources.value?.[sourceSelectedKey.value])
-watch(sourceSelected, () => {
-  yearSlider.value = 0
-})
-
-const years = computed(() => Object.keys(sourceSelected.value?.years ?? {}).sort())
-const yearDisplay = ref('??')
-
-const yearSliderStep = computed(() => fadeYears.value ? 0.01 : 1)
-
-watch(fadeYears, (enabled) => {
-  if (!enabled) {
-    yearSlider.value = Math.round(yearSlider.value)
-  }
-})
-
-const playing = useIncrementPlayer(yearSlider, { 
-  speed: playingSpeed,
-  step: yearSliderStep,
-  min: 0,
-  max: computed(() => years.value.length - 1)
-})
-
 </script>
 
 <style scoped>
