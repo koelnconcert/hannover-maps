@@ -197,7 +197,7 @@ const debugGridLayer = function (props: any) {
 }
 
 function sourceToTilesUrl(sourceConfig, year) {
-  const tilesConfig = sourceConfig.years?.[year]?.tiles ?? sourceConfig.tiles
+  const tilesConfig = getFromYearOrSourceConfig(sourceConfig, year, 'tiles')
   return config.public.tileBaseUrl + sourceConfig.key + '/' + year + '/{z}/{x}/{y}.' + tilesConfig.fileExtension
 }
 
@@ -206,11 +206,15 @@ function sourceToAttribution(sourceConfig, year) {
     return 'undefined'
   }
   let attribution = `<a href="${sourceConfig.website}">${sourceConfig.name}</a>`
-  const license = sourceConfig.years[year]?.license
+  const license = getFromYearOrSourceConfig(sourceConfig, year, 'license')
   if (license) {
     attribution += ` by ${license.holder} (<a href="${license.url}">${license.name}</a>)`
   }
   return attribution
+}
+
+function getFromYearOrSourceConfig(sourceConfig, year, propName) {
+  return sourceConfig.years?.[year]?.[propName] ?? sourceConfig[propName]
 }
 
 </script>
