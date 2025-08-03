@@ -2,7 +2,7 @@
   <div class="w-screen h-screen" :class="{ grayscaleForLayers : grayscale }">
     <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
       :minZoom="config.minZoom" :maxZoom="config.maxZoom">
-      <LayerMultipleYears
+      <MapLayerMultipleYears
          :source="source"
          :year-slider="yearSlider"
          :year-slider-deadzone="yearSliderDeadzone"
@@ -13,9 +13,9 @@
       <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :min-zoom="config.minZoom" :max-zoom="config.maxZoom" :z-index="800" :options="{ minNativeZoom: config.minZoom, maxNativeZoom: 18}"
         :attribution="attribution.openstreetmap"
       />
-      <LayerDebug :visible="debugGrid" :z-index="900"/>
+      <MapLayerDebug :visible="debugGrid" :z-index="900"/>
       <MapBox position-x="center" position-y="top" class="p-3">
-        <ControlOptions 
+        <Controls 
           v-model:source="source"
           v-model:base-opacity="baseOpacity"
           v-model:year-slider="yearSlider"

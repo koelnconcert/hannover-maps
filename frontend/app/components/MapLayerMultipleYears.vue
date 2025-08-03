@@ -1,6 +1,6 @@
 <template>
   <template v-for="(year, index) in years" :key="year">
-    <LayerSingle  
+    <MapLayerSingleYear  
       :source="source"
       :year="Number(year)"
       :visible="preload || (yearsOpacity[index] ?? 0) > 0" 
