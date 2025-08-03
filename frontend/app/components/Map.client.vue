@@ -1,7 +1,13 @@
 <template>
   <div class="w-screen h-screen" :class="{ grayscaleForLayers : options.grayscale }">
-    <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="config.maxBounds"
-      :minZoom="config.minZoom" :maxZoom="config.maxZoom">
+    <LMap 
+      :use-global-leaflet="false" 
+      v-model:zoom="zoom"
+      v-model:center="center"
+      :maxBounds="config.maxBounds"
+      :minZoom="config.minZoom"
+      :maxZoom="config.maxZoom"
+    >
       <MapLayerMultipleYears
          :source="source"
          :year-slider="yearSlider"
