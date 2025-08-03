@@ -1,7 +1,7 @@
 <template>
   <div class="grid grid-cols-[max-content_1fr_55px] gap-2 items-baseline">
     <span>Transparenz</span>
-    <USlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
+    <MySlider v-model="baseOpacity" :min="0" :max="1" :step="0.01" size="sm"/>
     {{ baseOpacity.toFixed(2) }}
 
     <span>Layer</span>
@@ -10,7 +10,7 @@
 
     <span>Jahr</span>
     <div class="flex gap-2">
-      <USlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="yearSliderStep" size="sm" :disabled="playing"/>
+      <MySlider v-model="yearSlider" :min="0" :max="years.length - 1" :step="yearSliderStep" :wheel-step="1" size="sm" :disabled="playing"/>
       <UButtonGroup size="xs">
         <UButton variant="outline" icon="i-lucide-chevron-first" :disabled="playing || yearSlider <= 0" @click="yearSlider = 0"/>
         <UButton variant="outline" icon="i-lucide-chevron-left" :disabled="playing || yearSlider <= 0" @click="yearSlider--"/>
@@ -21,15 +21,15 @@
     <span>{{ yearDisplay ?? '&nbsp;' }}</span>
 
     <span>Jahr-Deadzone</span>
-    <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm" :disabled="!options.fadeYears || playing"/>
+    <MySlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm" :disabled="!options.fadeYears || playing"/>
     {{ yearSliderDeadzone.toFixed(2) }}
 
     <span>Animation</span>
     <div class="flex gap-2">
-      <USlider v-model="playingSpeed" :min="1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
+      <MySlider v-model="playingSpeed" :min="1" :max="5" :step="0.1" size="sm" :disabled="playing"/>
       <UButton size="xs" variant="outline" :icon="playing ? 'i-lucide-pause' : 'i-lucide-play'" :disabled="yearSlider >= years.length" @click="playing = !playing"/>
     </div>
-    <span>{{ playingSpeed }}s</span>
+    <span>{{ playingSpeed.toFixed(1) }}s</span>
 
   </div>
   <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
@@ -102,4 +102,7 @@ watch(() => options.value.fadeYears, (enabled) => {
   }
 })
 
+function applyWheelEvent(model, event, steps=1) {
+  yearSlider -= Math.sign($event.deltaY)
+}
 </script>
