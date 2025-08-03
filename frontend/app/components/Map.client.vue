@@ -1,6 +1,6 @@
 <template>
   <div class="w-screen h-screen" :class="{ grayscaleForLayers : grayscale }">
-    <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="maxBounds"
+    <LMap :use-global-leaflet="false" v-model:zoom="zoom" v-model:center="center" :maxBounds="config.maxBounds"
       :minZoom="config.minZoom" :maxZoom="config.maxZoom">
       <MapLayerMultipleYears
          :source="source"
@@ -39,9 +39,8 @@ import { LMap } from "@vue-leaflet/vue-leaflet"
 
 const config = useConfig()
 
-const zoom = ref(12)
+const zoom = ref(config.minZoom)
 const center = ref<PointExpression>([52.4, 9.7])
-const maxBounds = ref([[52.2, 9.6], [53, 10]])
 
 const baseOpacity = ref(0.2)
 const yearSlider = ref(0)
