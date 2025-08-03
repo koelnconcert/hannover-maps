@@ -14,7 +14,7 @@
 <script setup lang="ts">
 import { LGridLayer, LRectangle } from "@vue-leaflet/vue-leaflet"
 
-const config = useConfig()
+const config = useMapConfig()
 
 defineProps({
   zIndex: Number

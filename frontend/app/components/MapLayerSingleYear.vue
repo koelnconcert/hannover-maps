@@ -16,7 +16,7 @@
 <script setup lang="ts">
 import { LTileLayer } from "@vue-leaflet/vue-leaflet"
 
-const config = useConfig()
+const config = useMapConfig()
 
 const props = defineProps({
   source: {

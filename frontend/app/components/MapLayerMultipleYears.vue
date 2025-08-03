@@ -3,7 +3,7 @@
     <MapLayerSingleYear  
       :source="source"
       :year="Number(year)"
-      :visible="preload || (yearsOpacity[index] ?? 0) > 0" 
+      :visible="options.preload || (yearsOpacity[index] ?? 0) > 0" 
       :opacity="yearsOpacity[index]" 
       :z-index="100 + index" 
     />
@@ -11,6 +11,8 @@
 </template>
 
 <script setup lang="ts">
+const options = useMapOptions()
+
 const props = defineProps({
   source: {
     type: Object,
@@ -27,10 +29,6 @@ const props = defineProps({
   zIndexBase: {
     type: Number,
     required: true
-  },
-  preload: {
-    type: Boolean,
-    default: () => false
   }
 })
 

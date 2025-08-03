@@ -21,7 +21,7 @@
     <span>{{ yearDisplay ?? '&nbsp;' }}</span>
 
     <span>Jahr-Deadzone</span>
-    <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm" :disabled="!fadeYears || playing"/>
+    <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm" :disabled="!options.fadeYears || playing"/>
     {{ yearSliderDeadzone.toFixed(2) }}
 
     <span>Animation</span>
@@ -34,25 +34,27 @@
   </div>
   <div class="flex flex-wrap mt-2 gap-x-5 gap-y-2">
     <div class="flex gap-1">
-      <USwitch v-model="preload"/>
+      <USwitch v-model="options.preload"/>
       <span>Alle Jahre vorladen</span>
     </div>
     <div class="flex gap-1">
-      <USwitch v-model="fadeYears"/>
+      <USwitch v-model="options.fadeYears"/>
       <span>Jahre überblenden</span>
     </div>
     <div class="flex gap-1">
-      <USwitch v-model="grayscale"/>
+      <USwitch v-model="options.grayscale"/>
       <span>nur Graustufen</span>
     </div>
     <div class="flex gap-1">
-      <USwitch v-model="debug"/>
+      <USwitch v-model="options.debug"/>
       <span>Debug</span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+const options = useMapOptions()
+
 const props = defineProps({
   sources: { type: Object, required: true },
   yearDisplay: { type: String, required: true }
@@ -62,14 +64,10 @@ const source = defineModel('source', { type: Object, required: true })
 const baseOpacity = defineModel('baseOpacity', { type: Number, required: true })
 const yearSlider = defineModel('yearSlider', { type: Number, required: true })
 const yearSliderDeadzone = defineModel('yearSliderDeadzone', { type: Number, required: true })
-const preload = defineModel('preload', { type: Boolean, required: true })
-const grayscale = defineModel('grayscale', { type: Boolean, required: true })
-const debug = defineModel('debug', { type: Boolean, required: true })
 
 const playingSpeed = ref(1)
-const fadeYears = ref(false)
 
-const yearSliderStep = computed(() => fadeYears.value ? 0.01 : 1)
+const yearSliderStep = computed(() => options.value.fadeYears ? 0.01 : 1)
 const years = computed(() => Object.keys(source.value?.years ?? {}).sort())
 
 const sourceSelection = computed(() => {
@@ -98,7 +96,7 @@ const playing = useIncrementPlayer(yearSlider, {
   max: computed(() => years.value.length - 1)
 })
 
-watch(fadeYears, (enabled) => {
+watch(() => options.value.fadeYears, (enabled) => {
   if (!enabled) {
     yearSlider.value = Math.round(yearSlider.value)
   }

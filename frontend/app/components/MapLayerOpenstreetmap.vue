@@ -21,7 +21,7 @@ defineProps({
   zIndex: Number
 })
 
-const config = useConfig()
+const config = useMapConfig()
   
 const attribution = '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
 </script>
