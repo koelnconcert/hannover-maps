@@ -11,7 +11,7 @@
          @return:year-display="yearDisplay = $event"
       />
       <MapLayerOpenstreetmap :opacity="baseOpacity" :z-index="200"/>
-      <MapLayerDebug :visible="debugGrid" :z-index="300"/>
+      <MapLayerDebug v-if="debug" :z-index="300"/>
       <MapBox position-x="center" position-y="top" class="p-3">
         <Controls 
           v-model:source="source"
@@ -20,13 +20,20 @@
           v-model:year-slider-deadzone="yearSliderDeadzone"
           v-model:preload="preload"
           v-model:grayscale="grayscale"
-          v-model:debug-grid="debugGrid"
+          v-model:debug="debug"
           :sources="sources"
           :year-display="yearDisplay"
         />
       </MapBox>
       <MapBox position-x="right" position-y="top" class="px-1 text-xl">
         {{ yearDisplay }}
+      </MapBox>
+      <MapBox v-if="debug" position-x="left" position-y="bottom" class="px-1">
+        <div class="grid grid-cols-[max-content_max-content] gap-x-2 items-baseline">
+          zoom <span>{{ zoom }}</span>
+          center <span>{{ center }}</span>
+          yearSlider <span>{{ yearSlider }}</span>
+        </div>
       </MapBox>
     </LMap>
   </div>
@@ -49,8 +56,8 @@ const yearDisplay = ref('??')
 const source = ref({})
 
 const grayscale = ref(false)
-const preload = ref(true)
-const debugGrid = ref(false)
+const preload = ref(false)
+const debug = ref(false)
 
 const { data: sources } = await useFetch(config.public.tileBaseUrl + 'sources.json')
 </script>

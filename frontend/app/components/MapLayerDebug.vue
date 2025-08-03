@@ -1,16 +1,22 @@
 <template>
   <LGridLayer 
-    :visible="visible" 
+    name="Debug Grid" 
     :child-render="debugGridLayer" 
     layer-type="overlay" 
-    name="Debug Grid" :z-index="zIndex"/>
+    :z-index="zIndex"/>
+  <LRectangle 
+    :bounds="config.maxBounds"
+    :fill="false"
+    color="#ff3333"
+  />
 </template>
 
 <script setup lang="ts">
-import { LGridLayer } from "@vue-leaflet/vue-leaflet"
+import { LGridLayer, LRectangle } from "@vue-leaflet/vue-leaflet"
+
+const config = useConfig()
 
 defineProps({
-  visible: Boolean,
   zIndex: Number
 })
 

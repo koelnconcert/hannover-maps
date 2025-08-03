@@ -46,8 +46,8 @@
       <span>nur Graustufen</span>
     </div>
     <div class="flex gap-1">
-      <USwitch v-model="debugGrid"/>
-      <span>Debug-Grid</span>
+      <USwitch v-model="debug"/>
+      <span>Debug</span>
     </div>
   </div>
 </template>
@@ -64,7 +64,7 @@ const yearSlider = defineModel('yearSlider', { type: Number, required: true })
 const yearSliderDeadzone = defineModel('yearSliderDeadzone', { type: Number, required: true })
 const preload = defineModel('preload', { type: Boolean, required: true })
 const grayscale = defineModel('grayscale', { type: Boolean, required: true })
-const debugGrid = defineModel('debugGrid', { type: Boolean, required: true })
+const debug = defineModel('debug', { type: Boolean, required: true })
 
 const playingSpeed = ref(1)
 const fadeYears = ref(false)
