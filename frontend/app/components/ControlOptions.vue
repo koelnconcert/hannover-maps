@@ -21,7 +21,7 @@
     <span>{{ yearDisplay ?? '&nbsp;' }}</span>
 
     <span>Jahr-Deadzone</span>
-    <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm"/>
+    <USlider v-model="yearSliderDeadzone" :min="0" :max="0.5" :step="0.01" size="sm" :disabled="!fadeYears || playing"/>
     {{ yearSliderDeadzone.toFixed(2) }}
 
     <span>Animation</span>
