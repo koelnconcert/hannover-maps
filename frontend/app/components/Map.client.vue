@@ -10,10 +10,8 @@
          :preload="preload"
          @return:year-display="yearDisplay = $event"
       />
-      <LTileLayer url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png" layer-type="overlay" name="OpenStreetMap" :visible="baseOpacity > 0" :opacity="baseOpacity" :min-zoom="config.minZoom" :max-zoom="config.maxZoom" :z-index="800" :options="{ minNativeZoom: config.minZoom, maxNativeZoom: 18}"
-        :attribution="attribution.openstreetmap"
-      />
-      <MapLayerDebug :visible="debugGrid" :z-index="900"/>
+      <MapLayerOpenstreetmap :opacity="baseOpacity" :z-index="200"/>
+      <MapLayerDebug :visible="debugGrid" :z-index="300"/>
       <MapBox position-x="center" position-y="top" class="p-3">
         <Controls 
           v-model:source="source"
@@ -37,7 +35,7 @@
 <script lang="ts" setup>
 import "leaflet/dist/leaflet.css"
 import type { PointExpression } from "leaflet"
-import { LMap, LTileLayer } from "@vue-leaflet/vue-leaflet"
+import { LMap } from "@vue-leaflet/vue-leaflet"
 
 const config = useConfig()
 
@@ -54,10 +52,6 @@ const source = ref({})
 const grayscale = ref(false)
 const preload = ref(true)
 const debugGrid = ref(false)
-
-const attribution = {
-  openstreetmap: '<a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-}
 
 const { data: sources } = await useFetch(config.public.tileBaseUrl + 'sources.json')
 </script>
